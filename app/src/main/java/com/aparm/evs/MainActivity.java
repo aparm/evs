@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 List<String> suggest = new ArrayList<>();
 
                 for (String search:suggestList) {
-                    if (search.toLowerCase().contains(materialSearchBar.getText().toLowerCase())) {
+                    if (search.toLowerCase().startsWith(materialSearchBar.getText().toLowerCase())) {
                         suggest.add(search);
                     }
                 }
@@ -85,9 +85,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //show all words
-        //when db will be full (it will work slow) -> TODO: delete this and Database.getWords()
-        adapter = new SearchAdapter(this, database.getWords());
+        //show "Tervitus" при запуске приложения
+        adapter = new SearchAdapter(this, database.findWords("Tervitus"));
         recyclerView.setAdapter(adapter);
 
     }

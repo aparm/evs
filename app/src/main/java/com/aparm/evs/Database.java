@@ -13,7 +13,7 @@ import java.util.List;
 
 class Database extends SQLiteAssetHelper {
 
-    private static final String DB_NAME = "evs.db";
+    private static final String DB_NAME = "evs4.db";
     private static final int DB_VER = 1;
 
 
@@ -49,8 +49,7 @@ class Database extends SQLiteAssetHelper {
         }
         return result;
     }
-
-    //TODO: поиск по переводам!!
+    
     List<Word> findWords(String search){
         List<Word> result = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -60,9 +59,9 @@ class Database extends SQLiteAssetHelper {
         String tableName = "Words";
 
         qb.setTables(tableName);
-        Cursor cursor = qb.query(db, sqlSelect, "Word LIKE ?" ,new String[]{"%"+search+"%"},null,null,null);
 
-
+        //слово которое полностью совпадает
+        Cursor cursor = qb.query(db, sqlSelect, "Word = ?" ,new String[]{search},null,null,null);
         if (cursor.moveToFirst()) {
 
             do {
@@ -80,19 +79,37 @@ class Database extends SQLiteAssetHelper {
         }
 
 
-        Cursor cursor2 = qb.query(db, sqlSelect, "Translations LIKE ?" ,new String[]{"%"+search+"%"},null,null,null);
 
+        Cursor cursor1 = qb.query(db, sqlSelect, "Word LIKE ?" ,new String[]{"%"+search+"%"},null,null,null);
+        if (cursor1.moveToFirst()) {
+
+            do {
+                Word word = new Word();
+                word.setId(cursor1.getInt(cursor1.getColumnIndex("Id")));
+                word.setWord(cursor1.getString(cursor1.getColumnIndex("Word")));
+                word.setType(cursor1.getString((cursor1.getColumnIndex("Type"))));
+                word.setForms(cursor1.getString(cursor1.getColumnIndex("Forms")));
+                word.setNumber(cursor1.getInt(cursor1.getColumnIndex("Number")));
+                word.setTranslations(cursor1.getString(cursor1.getColumnIndex("Translations")));
+                word.setText(cursor1.getString(cursor1.getColumnIndex("Text")));
+
+                result.add(word);
+            } while (cursor1.moveToNext());
+        }
+
+
+        Cursor cursor2 = qb.query(db, sqlSelect, "Translations LIKE ?" ,new String[]{"%"+search+"%"},null,null,null);
         if (cursor2.moveToFirst()) {
 
             do {
                 Word word = new Word();
-                word.setId(cursor2.getInt(cursor.getColumnIndex("Id")));
-                word.setWord(cursor2.getString(cursor.getColumnIndex("Word")));
-                word.setType(cursor2.getString((cursor.getColumnIndex("Type"))));
-                word.setForms(cursor2.getString(cursor.getColumnIndex("Forms")));
-                word.setNumber(cursor2.getInt(cursor.getColumnIndex("Number")));
-                word.setTranslations(cursor2.getString(cursor.getColumnIndex("Translations")));
-                word.setText(cursor2.getString(cursor.getColumnIndex("Text")));
+                word.setId(cursor2.getInt(cursor2.getColumnIndex("Id")));
+                word.setWord(cursor2.getString(cursor2.getColumnIndex("Word")));
+                word.setType(cursor2.getString((cursor2.getColumnIndex("Type"))));
+                word.setForms(cursor2.getString(cursor2.getColumnIndex("Forms")));
+                word.setNumber(cursor2.getInt(cursor2.getColumnIndex("Number")));
+                word.setTranslations(cursor2.getString(cursor2.getColumnIndex("Translations")));
+                word.setText(cursor2.getString(cursor2.getColumnIndex("Text")));
 
                 result.add(word);
             } while (cursor2.moveToNext());
